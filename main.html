@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Araba Kontrolü</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #car {
+            width: 150px;
+            height: auto;
+            position: relative;
+            transition: transform 0.2s ease, top 0.2s ease, left 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <img id="car" src="araba.png" alt="Araba">
+
+    <script>
+        const car = document.getElementById('car');
+        const baseURL = 'http://192.168.117.205/';
+
+        function sendRequest(path) {
+            fetch(baseURL + path)
+                .then(response => console.log(`${path} request sent`))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function moveCar(top, left) {
+            car.style.top = top + 'px';
+            car.style.left = left + 'px';
+        }
+
+        // Araba başlangıç konumu
+        let topPosition = 0;
+        let leftPosition = 0;
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp': // Yukarı ok tuşu - Araba ileri gitsin
+                    car.style.transform = 'rotate(0deg)';
+                    topPosition -= 10; // Araba yukarıya doğru 10px hareket eder
+                    moveCar(topPosition, leftPosition);
+                    sendRequest('motor_on');
+                    break;
+                case 'ArrowDown': // Aşağı ok tuşu - Araba geri gitsin
+                    car.style.transform = 'rotate(180deg)';
+                    topPosition += 10; // Araba aşağıya doğru 10px hareket eder
+                    moveCar(topPosition, leftPosition);
+                    sendRequest('motor_off');
+                    break;
+                case 'ArrowRight': // Sağ ok tuşu - Araba sağa gitsin
+                    car.style.transform = 'rotate(90deg)';
+                    leftPosition += 10; // Araba sağa doğru 10px hareket eder
+                    moveCar(topPosition, leftPosition);
+                    sendRequest('motor2_on');
+                    break;
+                case 'ArrowLeft': // Sol ok tuşu - Araba sola gitsin
+                    car.style.transform = 'rotate(-90deg)';
+                    leftPosition -= 10; // Araba sola doğru 10px hareket eder
+                    moveCar(topPosition, leftPosition);
+                    sendRequest('motor1_on');
+                    break;
+                default: // Diğer tuşlar
+                    car.style.transform = 'rotate(0deg)';
+                    sendRequest('motor_off');
+                    break;
+            }
+        });
+
+        // Başlangıçta motor_off göndermek
+        sendRequest('motor_off');
+    </script>
+</body>
+</html>
